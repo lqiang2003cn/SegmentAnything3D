@@ -32,9 +32,9 @@ import util
 
 # params
 parser = argparse.ArgumentParser()
-parser.add_argument('--scannet_path', required=True, help='path to scannet data')
-parser.add_argument('--output_path', required=True, help='where to output 2d data')
-parser.add_argument('--export_label_images', dest='export_label_images', action='store_true')
+parser.add_argument('--scannet_path', default='../../resource/scans', help='path to scannet data')
+parser.add_argument('--output_path', default='../../resource/output', help='where to output 2d data')
+parser.add_argument('--export_label_images', default=True)
 parser.add_argument('--label_type', default='label-filt', help='which labels (label or label-filt)')
 parser.add_argument('--frame_skip', type=int, default=20, help='export every nth frame')
 parser.add_argument('--label_map_file', default='',

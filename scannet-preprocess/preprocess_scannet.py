@@ -181,19 +181,18 @@ def handle_process(scene_path, output_path, labels_pd, train_scenes, val_scenes,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset_root', required=True, help='Path to the ScanNet dataset containing scene folders')
-    parser.add_argument('--output_root', required=True, help='Output path where train/val folders will be located')
+    parser.add_argument('--dataset_root', default='../resource', help='Path to the ScanNet dataset containing scans folders')
+    parser.add_argument('--output_root', default='../resource/processed_scans', help='Output path where train/val folders will be located')
     parser.add_argument('--parse_normals', default=True, type=bool, help='Whether parse point normals')
     config = parser.parse_args()
 
     # Load label map
-    labels_pd = pd.read_csv('scannet-preprocess/meta_data/scannetv2-labels.combined.tsv',
-                            sep='\t', header=0)
+    labels_pd = pd.read_csv('meta_data/scannetv2-labels.combined.tsv', sep='\t', header=0)
 
     # Load train/val splits
-    with open('scannet-preprocess/meta_data/scannetv2_train.txt') as train_file:
+    with open('meta_data/scannetv2_train.txt') as train_file:
         train_scenes = train_file.read().splitlines()
-    with open('scannet-preprocess/meta_data/scannetv2_val.txt') as val_file:
+    with open('meta_data/scannetv2_val.txt') as val_file:
         val_scenes = val_file.read().splitlines()
 
     # Create output directories
@@ -209,7 +208,7 @@ if __name__ == '__main__':
 
     # Preprocess data.
     print('Processing scenes...')
-    pool = ProcessPoolExecutor(max_workers=mp.cpu_count())
+    pool = ProcessPoolExecutor(max_workers=1)
     # pool = ProcessPoolExecutor(max_workers=1)
     _ = list(pool.map(handle_process, scene_paths, repeat(config.output_root), repeat(labels_pd), repeat(train_scenes),
                       repeat(val_scenes), repeat(config.parse_normals)))

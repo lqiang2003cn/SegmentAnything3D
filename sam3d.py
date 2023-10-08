@@ -248,13 +248,12 @@ def seg_pcd(scene_name, rgb_path, data_path, save_path, mask_generator, voxel_si
 def get_args():
     '''Command line arguments.'''
 
-    parser = argparse.ArgumentParser(
-        description='Segment Anything on ScanNet.')
-    parser.add_argument('--rgb_path', type=str, help='the path of rgb data')
-    parser.add_argument('--data_path', type=str, default='', help='the path of pointcload data')
-    parser.add_argument('--save_path', type=str, help='Where to save the pcd results')
-    parser.add_argument('--save_2dmask_path', type=str, default='', help='Where to save 2D segmentation result from SAM')
-    parser.add_argument('--sam_checkpoint_path', type=str, default='', help='the path of checkpoint for SAM')
+    parser = argparse.ArgumentParser(description='Segment Anything on ScanNet.')
+    parser.add_argument('--rgb_path', type=str, default="./resource/processed_scans", help='the path of rgb data')
+    parser.add_argument('--data_path', type=str, default='./resource/processed_scans', help='the path of pointcload data')
+    parser.add_argument('--save_path', type=str,  default='./resource/output/pcd', help='Where to save the pcd results')
+    parser.add_argument('--save_2dmask_path', default='./resource/output/mask', type=str, help='Where to save 2D segmentation result from SAM')
+    parser.add_argument('--sam_checkpoint_path', type=str, default='../../sam_vit_h_4b8939.pth', help='the path of checkpoint for SAM')
     parser.add_argument('--scannetv2_train_path', type=str, default='scannet-preprocess/meta_data/scannetv2_train.txt', help='the path of scannetv2_train.txt')
     parser.add_argument('--scannetv2_val_path', type=str, default='scannet-preprocess/meta_data/scannetv2_val.txt', help='the path of scannetv2_val.txt')
     parser.add_argument('--img_size', default=[640,480])
@@ -274,10 +273,11 @@ if __name__ == '__main__':
     with open(args.scannetv2_val_path) as val_file:
         val_scenes = val_file.read().splitlines()
     mask_generator = SamAutomaticMaskGenerator(build_sam(checkpoint=args.sam_checkpoint_path).to(device="cuda"))
+    # mask_generator = None
     voxelize = Voxelize(voxel_size=args.voxel_size, mode="train", keys=("coord", "color", "group"))
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
-    scene_names = sorted(os.listdir(args.rgb_path))
+    scene_names = sorted(os.listdir(args.rgb_path))[0:1]
     for scene_name in scene_names:
         seg_pcd(scene_name, args.rgb_path, args.data_path, args.save_path, mask_generator, args.voxel_size, 
             voxelize, args.th, train_scenes, val_scenes, args.save_2dmask_path)
